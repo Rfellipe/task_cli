@@ -2,12 +2,11 @@
 #include <asm-generic/errno-base.h>
 #include <dirent.h>
 #include <errno.h>
-#include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
 #include <sys/stat.h>
 
-static char task_file_path[PATH_LEN];
+// static char task_file_path[PATH_LEN];
+FILE *task_file;
 
 void help() { printf("%s", HELP_MSG); }
 
@@ -17,7 +16,6 @@ void panic(const char *message) {
 }
 
 int check_task_directory() {
-  FILE *file;
   char *dir_path = malloc(PATH_LEN);
 #ifdef _WIN32
   // TODO: Handle windows directory creation
@@ -32,9 +30,7 @@ int check_task_directory() {
     closedir(dir);
   } else if (ENOENT == errno) {
     int status = mkdir(dir_path, 0700);
-    if (status == 0) {
-      printf("Directory created\n");
-    } else {
+    if (status != 0) {
       printf("Error creating creating directory\n");
       return 1;
     }
@@ -45,15 +41,15 @@ int check_task_directory() {
 
   strcat(dir_path, "/tasks.json");
 create_file:
-  file = fopen(dir_path, "r");
-  if (file != NULL) {
-    fclose(file);
-    strcpy(task_file_path, dir_path);
+  task_file = fopen(dir_path, "r+");
+  if (task_file != NULL) {
+    // fclose(file);
+    // strcpy(task_file_path, dir_path);
     free(dir_path);
   } else {
-    file = fopen(dir_path, "w");
-    fprintf(file, "{}\n");
-    fclose(file);
+    task_file = fopen(dir_path, "w+");
+    fprintf(task_file, "[]\n");
+    fclose(task_file);
     goto create_file;
     return 1;
   }
@@ -61,26 +57,13 @@ create_file:
   return 0;
 }
 
-FILE *get_tasks_file(const char *dir_path, const char *__restrict __modes) {
-  FILE *fptr;
-  char *file_path = malloc(PATH_LEN);
-  sprintf(file_path, "%s/tasks.json", dir_path);
-
-  fptr = fopen(file_path, __modes);
-  if (fptr == NULL)
-    panic("Error handling opening file");
-
-  return fptr;
-}
-
-int list_tasks() { return 0; }
-
-int add_task() {
-  // FILE *tasks = get_tasks_file(const char *dir_path, const char *restrict
-  // modes);
+int list_tasks() {
+  parse_task_file(task_file);
 
   return 0;
 }
+
+int add_task() { return 0; }
 
 int update_task() { return 0; }
 
