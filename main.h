@@ -11,6 +11,16 @@
 #define HELP_MSG                                                               \
   "Help msg\n"                                                                 \
   "TEste\n"
+#define JSON_FORMAT                                                            \
+  ",\n"                                                                        \
+  "  {\n"                                                                      \
+  "    \"id\": %d,\n"                                                          \
+  "    \"description\": \"%s\",\n"                                             \
+  "    \"status\": \"%s\",\n"                                                  \
+  "    \"created_at\": %ld,\n"                                                 \
+  "    \"updated_at\": %ld\n"                                                  \
+  "  }\n"                                                                      \
+  "]\n"
 
 typedef enum { IN_PROGRESS, DONE, TODO } task_status;
 
