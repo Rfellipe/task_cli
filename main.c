@@ -2,6 +2,7 @@
 #include <asm-generic/errno-base.h>
 #include <dirent.h>
 #include <errno.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/stat.h>
@@ -14,6 +15,13 @@ void help() { printf("%s", HELP_MSG); }
 void panic(const char *message) {
   fprintf(stderr, "panic: %s\n", message);
   exit(1);
+}
+
+void print_task(struct task_type *task) {
+  printf("TASK INFO: \nid: %d\ndescription: %s\nstatus: %s\ncreated_at: "
+         "%ld\tupdated_at: %ld\n\n",
+         task->id, task->description, task->status, task->created_at,
+         task->updated_at);
 }
 
 int check_task_directory() {
@@ -58,15 +66,17 @@ create_file:
   return 0;
 }
 
-int list_tasks() {
+int list_tasks(const char *status_filter) {
   struct tasks parsed_tasks = parse_task_file(task_file);
 
   for (int i = 0; i < parsed_tasks.tasks_len; i++) {
-    printf("TASK INFO: \nid: %d\ndescription: %s\nstatus: %s\ncreated_at: "
-           "%ld\tupdated_at: %ld\n\n",
-           parsed_tasks.tasks[i]->id, parsed_tasks.tasks[i]->description,
-           parsed_tasks.tasks[i]->status, parsed_tasks.tasks[i]->created_at,
-           parsed_tasks.tasks[i]->updated_at);
+    if (!status_filter) {
+      print_task(parsed_tasks.tasks[i]);
+    } else {
+      if (strcmp(parsed_tasks.tasks[i]->status, status_filter) == 0) {
+        print_task(parsed_tasks.tasks[i]);
+      }
+    }
   }
 
   return 0;
@@ -98,21 +108,40 @@ int main(int argc, char **argv) {
     panic("Error on directory handling");
   }
 
-  if (!strcmp(argv[1], "add")) {
+  if (strcmp(argv[1], "add") == 0) {
     add_task();
-  } else if (!strcmp(argv[1], "update")) {
+
+  } else if (strcmp(argv[1], "update") == 0) {
     update_task();
-  } else if (!strcmp(argv[1], "delete")) {
+
+  } else if (strcmp(argv[1], "delete") == 0) {
     delete_task();
-  } else if (!strcmp(argv[1], "mark-in-progress")) {
+
+  } else if (strcmp(argv[1], "mark-in-progress") == 0) {
     update_task(); // mark-in-progress
-  } else if (!strcmp(argv[1], "mark-done")) {
+
+  } else if (strcmp(argv[1], "mark-done") == 0) {
     update_task(); // mark-done
-  } else if (!strcmp(argv[1], "list")) {
-    list_tasks();
+
+  } else if (strcmp(argv[1], "list") == 0) {
+    if (argv[2]) {
+      if (strcmp(argv[2], "done") == 0) {
+        list_tasks("done");
+
+      } else if (strcmp(argv[2], "todo") == 0) {
+        list_tasks("todo");
+
+      } else if (strcmp(argv[2], "in-progress") == 0) {
+        list_tasks("in-progress");
+
+      } else {
+        panic("Argument not known");
+      }
+    } else {
+      list_tasks(NULL);
+    }
   } else {
-    printf("Parameter not known\n");
-    return 1;
+    panic("Argument not known");
   }
 
   return 0;
