@@ -6,6 +6,7 @@
 
 #define FALSE 0
 #define TRUE 1
+#define ARR_LEN(arr) sizeof(arr) / sizeof(arr[0])
 #define PATH_LEN 256
 #define HELP_MSG                                                               \
   "Help msg\n"                                                                 \
@@ -13,14 +14,21 @@
 
 typedef enum { IN_PROGRESS, DONE, TODO } task_status;
 
-typedef struct {
+struct task_type {
   int id;
   char *description;
-  char *status;
+  char status[15];
   long int created_at;
   long int updated_at;
-} task_type;
+};
 
-task_type **parse_task_file(FILE *task_file);
+struct tasks {
+  struct task_type **tasks;
+  int tasks_len;
+};
+
+struct tasks parse_task_file(FILE *task_file);
+
+void panic(const char *message);
 
 #endif

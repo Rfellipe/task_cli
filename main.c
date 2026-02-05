@@ -2,6 +2,7 @@
 #include <asm-generic/errno-base.h>
 #include <dirent.h>
 #include <errno.h>
+#include <stdlib.h>
 #include <string.h>
 #include <sys/stat.h>
 
@@ -58,7 +59,15 @@ create_file:
 }
 
 int list_tasks() {
-  parse_task_file(task_file);
+  struct tasks parsed_tasks = parse_task_file(task_file);
+
+  for (int i = 0; i < parsed_tasks.tasks_len; i++) {
+    printf("TASK INFO: \nid: %d\ndescription: %s\nstatus: %s\ncreated_at: "
+           "%ld\tupdated_at: %ld\n\n",
+           parsed_tasks.tasks[i]->id, parsed_tasks.tasks[i]->description,
+           parsed_tasks.tasks[i]->status, parsed_tasks.tasks[i]->created_at,
+           parsed_tasks.tasks[i]->updated_at);
+  }
 
   return 0;
 }
