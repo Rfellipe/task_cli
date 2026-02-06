@@ -3,6 +3,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #define FALSE 0
 #define TRUE 1
@@ -22,7 +23,7 @@
   "  }\n"                                                                      \
   "]\n"
 
-typedef enum { IN_PROGRESS, DONE, TODO } task_status;
+typedef enum { IN_PROGRESS = 1, DONE = 2 } task_status;
 
 struct task_type {
   int id;
@@ -40,5 +41,13 @@ struct tasks {
 struct tasks parse_task_file(FILE *task_file);
 
 void panic(const char *message);
+
+int list_tasks(const char *status_filter);
+
+int add_task(char *task_description);
+
+int update_task(char *task_id, char *task_description, int new_status);
+
+int delete_task();
 
 #endif
