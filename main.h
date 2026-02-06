@@ -23,7 +23,12 @@
   "  }\n"                                                                      \
   "]\n"
 
-typedef enum { IN_PROGRESS = 1, DONE = 2 } task_status;
+typedef enum { IN_PROGRESS = 1, DONE } task_status;
+typedef enum {
+  ARG_MISS = 1,
+  ARG_UNKOWN,
+  ARG_ERROR,
+} errors;
 
 struct task_type {
   int id;
@@ -41,6 +46,8 @@ struct tasks {
 struct tasks parse_task_file(FILE *task_file);
 
 void panic(const char *message);
+
+void error(errors error, const char *message);
 
 int list_tasks(const char *status_filter);
 

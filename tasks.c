@@ -1,5 +1,6 @@
 #include "main.h"
 #include <ctype.h>
+#include <stdlib.h>
 #include <time.h>
 
 extern FILE *task_file;
@@ -29,6 +30,11 @@ int list_tasks(const char *status_filter) {
 int add_task(char *task_description) {
   int i = 0;
   char c;
+
+  if (!task_description) {
+    error(ARG_MISS, "description");
+  }
+
   int last_task_id = parsed_tasks.tasks[parsed_tasks.tasks_len - 1]->id;
   struct task_type new_task = {
       .id = last_task_id += 1,
@@ -52,16 +58,17 @@ int add_task(char *task_description) {
 }
 
 int update_task(char *task_id, char *task_description, int new_status) {
-  // task-cli update 1 "new description"
-  if (!task_id || !task_description) {
-    printf("Insuficient arguments\n");
-    return 1;
+  int id;
+
+  if (!task_id || (!task_description && !new_status)) {
+    error(ARG_MISS, "Missing either task ID or task description");
   }
 
-  if (!isdigit(task_id)) {
-    printf("Task ID should be a number\n");
-    return 1;
+  if (!isdigit(task_id[0])) {
+    error(ARG_ERROR, "Task ID should be a number");
   }
+
+  id = atoi(task_id);
 
   if (new_status) {
     // TODO: Path for mark-in-progress and mark-done
@@ -70,6 +77,8 @@ int update_task(char *task_id, char *task_description, int new_status) {
       break;
     case DONE:
       break;
+    default:
+      panic("Parameter not recognized");
     }
 
     return 0;

@@ -13,6 +13,23 @@ void panic(const char *message) {
   exit(1);
 }
 
+void error(errors error, const char *message) {
+  switch (error) {
+  case ARG_MISS:
+    fprintf(stderr, "Missing Argument: %s\n", message);
+    break;
+  case ARG_UNKOWN:
+    fprintf(stderr, "Unknown argument: %s\n", message);
+    break;
+  case ARG_ERROR:
+    fprintf(stderr, "Wrong argument: %s\n", message);
+    break;
+  }
+
+  help();
+  exit(error);
+}
+
 int check_task_directory() {
   char *dir_path = malloc(PATH_LEN);
 #ifdef _WIN32
@@ -29,12 +46,10 @@ int check_task_directory() {
   } else if (ENOENT == errno) {
     int status = mkdir(dir_path, 0700);
     if (status != 0) {
-      printf("Error creating creating directory\n");
-      return 1;
+      panic("Error creating creating directory\n");
     }
   } else {
-    printf("Error opening directory\n");
-    return 1;
+    panic("Error opening directory\n");
   }
 
   strcat(dir_path, "/tasks.json");
@@ -56,7 +71,7 @@ create_file:
 }
 
 int main(int argc, char **argv) {
-  int err, task_id;
+  int err;
 
   if (argc == 1) {
     help();
@@ -70,12 +85,6 @@ int main(int argc, char **argv) {
   parsed_tasks = parse_task_file(task_file);
 
   if (strcmp(argv[1], "add") == 0) {
-    if (!argv[2]) {
-      printf("Need a task name\n");
-      help();
-      return 1;
-    }
-
     add_task(argv[2]);
 
   } else if (strcmp(argv[1], "update") == 0) {
@@ -102,13 +111,13 @@ int main(int argc, char **argv) {
         list_tasks("in-progress");
 
       } else {
-        panic("Argument not known");
+        error(ARG_UNKOWN, argv[2]);
       }
     } else {
       list_tasks(NULL);
     }
   } else {
-    panic("Argument not known");
+    error(ARG_UNKOWN, argv[1]);
   }
 
   fclose(task_file);
