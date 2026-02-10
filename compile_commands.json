@@ -1,0 +1,41 @@
+[
+  {
+    "file": "src/main.c",
+    "arguments": [
+      "gcc",
+      "-Iinclude",
+      "-c",
+      "src/main.c",
+      "-o",
+      "build/main.o"
+    ],
+    "directory": "/home/fellipe/Projects/C/task_cli",
+    "output": "build/main.o"
+  },
+  {
+    "file": "src/parser.c",
+    "arguments": [
+      "gcc",
+      "-Iinclude",
+      "-c",
+      "src/parser.c",
+      "-o",
+      "build/parser.o"
+    ],
+    "directory": "/home/fellipe/Projects/C/task_cli",
+    "output": "build/parser.o"
+  },
+  {
+    "file": "src/tasks.c",
+    "arguments": [
+      "gcc",
+      "-Iinclude",
+      "-c",
+      "src/tasks.c",
+      "-o",
+      "build/tasks.o"
+    ],
+    "directory": "/home/fellipe/Projects/C/task_cli",
+    "output": "build/tasks.o"
+  }
+]

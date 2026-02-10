@@ -1,4 +1,4 @@
-#include "main.h"
+#include <main.h>
 #include <dirent.h>
 #include <errno.h>
 #include <sys/stat.h>
