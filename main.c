@@ -1,6 +1,7 @@
 #include "main.h"
 #include <dirent.h>
 #include <errno.h>
+#include <stdio.h>
 #include <sys/stat.h>
 
 FILE *task_file;
@@ -80,6 +81,17 @@ create_file:
   return 0;
 }
 
+void clear_file() {
+  char *dir_path = get_directory_path();
+
+  strcat(dir_path, "/tasks.json");
+  freopen(dir_path, "w", task_file);
+
+  if (task_file == NULL) {
+    panic("Error clearing file");
+  }
+}
+
 int main(int argc, char **argv) {
   int err;
 
@@ -108,7 +120,7 @@ int main(int argc, char **argv) {
     update_task(argv[2], argv[3], 0);
 
   } else if (strcmp(argv[1], "delete") == 0) {
-    delete_task();
+    delete_task(argv[2]);
 
   } else if (strcmp(argv[1], "mark-in-progress") == 0) {
     update_task(argv[2], NULL, IN_PROGRESS);

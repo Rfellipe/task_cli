@@ -119,6 +119,7 @@ struct tasks parse_task_file(FILE *task_file) {
 }
 
 int write_new_task_file(FILE *task_file, struct tasks tasks) {
+  clear_file();
   fflush(task_file);
   fseek(task_file, 0, SEEK_SET);
 

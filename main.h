@@ -53,12 +53,14 @@ void panic(const char *message);
 
 void error(errors error, const char *message);
 
+void clear_file();
+
 int list_tasks(const char *status_filter);
 
 int add_task(char *task_description);
 
 int update_task(char *task_id, char *task_description, int new_status);
 
-int delete_task();
+int delete_task(char *task_id);
 
 #endif

@@ -2,6 +2,7 @@
 #include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <time.h>
 
 extern FILE *task_file;
@@ -75,7 +76,6 @@ int update_task(char *task_id, char *task_description, int new_status) {
   struct task_type *task = parsed_tasks.tasks[id - 1];
 
   if (new_status) {
-    // TODO: Path for mark-in-progress and mark-done
     switch (new_status) {
     case IN_PROGRESS:
       snprintf(task->status, sizeof(task->status), "%s", "in-progress");
@@ -95,4 +95,38 @@ int update_task(char *task_id, char *task_description, int new_status) {
   return 0;
 }
 
-int delete_task() { return 0; }
+int delete_task(char *task_id) {
+  int id;
+
+  if (!task_id) {
+    error(ARG_MISS, "Missing either task ID");
+  }
+
+  if (!isdigit(task_id[0])) {
+    error(ARG_ERROR, "Task ID should be a number");
+  }
+
+  id = atoi(task_id);
+
+  for (int i = 0; i < parsed_tasks.tasks_len; i++) {
+    struct task_type *task = parsed_tasks.tasks[i];
+
+    if (task->id == id) {
+      memset(parsed_tasks.tasks[i], 0, sizeof(struct task_type));
+    }
+
+    if (task->id > id) {
+      task->id -= 1;
+      memcpy(parsed_tasks.tasks[i - 1], task, sizeof(struct task_type));
+      free(parsed_tasks.tasks[i]);
+    }
+
+    if (i + 1 == parsed_tasks.tasks_len) {
+      parsed_tasks.tasks_len = i;
+    }
+  }
+
+  write_new_task_file(task_file, parsed_tasks);
+
+  return 0;
+}
