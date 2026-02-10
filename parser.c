@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-int parse_task(struct task_type *task, char *key, char *value) {
+static int parse_task(struct task_type *task, char *key, char *value) {
   if (strcmp(key, "id") == 0) {
     task->id = atoi(value);
 
@@ -116,4 +116,41 @@ struct tasks parse_task_file(FILE *task_file) {
   struct tasks parsed_tasks = {.tasks = tasks, .tasks_len = i};
 
   return parsed_tasks;
+}
+
+int write_new_task_file(FILE *task_file, struct tasks tasks) {
+  fflush(task_file);
+  fseek(task_file, 0, SEEK_SET);
+
+  printf("task_len %d\n", tasks.tasks_len);
+
+  fputs("[\n", task_file);
+  for (int i = 0; i <= tasks.tasks_len; i++) {
+    fputs("{\"id\":", task_file);
+    fprintf(task_file, "%d,", tasks.tasks[i]->id);
+
+    fputs("\"description\":\"", task_file);
+    fprintf(task_file, "%s", tasks.tasks[i]->description);
+    fputs("\",", task_file);
+
+    fputs("\"status\":\"", task_file);
+    fprintf(task_file, "%s", tasks.tasks[i]->status);
+    fputs("\",", task_file);
+
+    fputs("\"created_at\":", task_file);
+    fprintf(task_file, "%ld,", tasks.tasks[i]->created_at);
+
+    fputs("\"updated_at\":", task_file);
+    fprintf(task_file, "%ld", tasks.tasks[i]->updated_at);
+
+    if (i + 1 < tasks.tasks_len) {
+      fputs("},\n", task_file);
+    } else {
+      fputs("}\n", task_file);
+    }
+  }
+  fputs("]\n", task_file);
+  fflush(task_file);
+
+  return 0;
 }

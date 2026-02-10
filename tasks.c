@@ -1,12 +1,13 @@
 #include "main.h"
 #include <ctype.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
 
 extern FILE *task_file;
 extern struct tasks parsed_tasks;
 
-void print_task(struct task_type *task) {
+static void print_task(struct task_type *task) {
   printf("TASK INFO: \nid: %d\ndescription: %s\nstatus: %s\ncreated_at: "
          "%ld\tupdated_at: %ld\n\n",
          task->id, task->description, task->status, task->created_at,
@@ -28,29 +29,30 @@ int list_tasks(const char *status_filter) {
 }
 
 int add_task(char *task_description) {
-  int i = 0;
+  int new_task_id = 0;
   char c;
 
   if (!task_description) {
     error(ARG_MISS, "description");
   }
 
-  int last_task_id = parsed_tasks.tasks[parsed_tasks.tasks_len - 1]->id;
+  new_task_id = parsed_tasks.tasks_len
+                    ? parsed_tasks.tasks[parsed_tasks.tasks_len - 1]->id
+                    : 0;
+
   struct task_type new_task = {
-      .id = last_task_id += 1,
+      .id = new_task_id + 1,
       .description = task_description,
       .status = "todo",
       .created_at = time(NULL),
       .updated_at = time(NULL),
   };
 
-  fseek(task_file, i, SEEK_END);
-  while ((c = fgetc(task_file)) != '}') {
-    fseek(task_file, i--, SEEK_END);
-  }
+  parsed_tasks.tasks[new_task_id] = malloc(sizeof(struct task_type));
+  *parsed_tasks.tasks[new_task_id] = new_task;
+  parsed_tasks.tasks_len = new_task_id;
 
-  fprintf(task_file, JSON_FORMAT, new_task.id, new_task.description,
-          new_task.status, new_task.created_at, new_task.updated_at);
+  write_new_task_file(task_file, parsed_tasks);
 
   printf("Added task successfully (ID: %d)\n", new_task.id);
 

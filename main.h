@@ -45,6 +45,10 @@ struct tasks {
 
 struct tasks parse_task_file(FILE *task_file);
 
+int write_new_task_file(FILE *task_file, struct tasks tasks);
+
+char *get_directory_path();
+
 void panic(const char *message);
 
 void error(errors error, const char *message);

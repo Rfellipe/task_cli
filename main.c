@@ -30,7 +30,7 @@ void error(errors error, const char *message) {
   exit(error);
 }
 
-int check_task_directory() {
+char *get_directory_path() {
   char *dir_path = malloc(PATH_LEN);
 #ifdef _WIN32
   // TODO: Handle windows directory creation
@@ -39,6 +39,12 @@ int check_task_directory() {
 #elif __linux__
   sprintf(dir_path, "%s/task_cli", getenv("HOME"));
 #endif
+
+  return dir_path;
+}
+
+int check_task_directory() {
+  char *dir_path = get_directory_path();
 
   DIR *dir = opendir(dir_path);
   if (dir) {
@@ -52,12 +58,16 @@ int check_task_directory() {
     panic("Error opening directory\n");
   }
 
+  return 0;
+}
+
+int check_file() {
+  char *dir_path = get_directory_path();
+
   strcat(dir_path, "/tasks.json");
 create_file:
   task_file = fopen(dir_path, "r+");
   if (task_file != NULL) {
-    // fclose(file);
-    // strcpy(task_file_path, dir_path);
     free(dir_path);
   } else {
     task_file = fopen(dir_path, "w+");
@@ -82,7 +92,14 @@ int main(int argc, char **argv) {
     panic("Error on directory handling");
   }
 
+  if (check_file() != 0) {
+    panic("Error on file handling");
+  }
+
   parsed_tasks = parse_task_file(task_file);
+
+  if (task_file == NULL)
+    return 1;
 
   if (strcmp(argv[1], "add") == 0) {
     add_task(argv[2]);
