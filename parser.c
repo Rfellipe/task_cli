@@ -1,8 +1,4 @@
 #include "main.h"
-#include <ctype.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 
 static int parse_task(struct task_type *task, char *key, char *value) {
   if (strcmp(key, "id") == 0) {

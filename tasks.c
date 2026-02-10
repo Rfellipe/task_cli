@@ -1,18 +1,24 @@
 #include "main.h"
-#include <ctype.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <time.h>
 
 extern FILE *task_file;
 extern struct tasks parsed_tasks;
 
+char *format_unix_time(long int t) {
+  struct tm tm;
+  char buf[32];
+
+  localtime_r(&t, &tm);
+  strftime(buf, sizeof(buf), "%Y-%m-%d %H:%M:%S", &tm);
+
+  return strdup(buf);
+}
+
 static void print_task(struct task_type *task) {
   printf("TASK INFO: \nid: %d\ndescription: %s\nstatus: %s\ncreated_at: "
-         "%ld\tupdated_at: %ld\n\n",
-         task->id, task->description, task->status, task->created_at,
-         task->updated_at);
+         "%s\tupdated_at: %s\n\n",
+         task->id, task->description, task->status,
+         format_unix_time(task->created_at),
+         format_unix_time(task->updated_at));
 }
 
 int list_tasks(const char *status_filter) {
@@ -89,6 +95,8 @@ int update_task(char *task_id, char *task_description, int new_status) {
   } else {
     parsed_tasks.tasks[id - 1]->description = strdup(task_description);
   }
+
+  parsed_tasks.tasks[id - 1]->updated_at = time(NULL);
 
   write_new_task_file(task_file, parsed_tasks);
 

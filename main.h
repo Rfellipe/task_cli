@@ -1,27 +1,18 @@
 #ifndef MAIN_H
 #define MAIN_H
 
+#include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 
 #define FALSE 0
 #define TRUE 1
-#define ARR_LEN(arr) sizeof(arr) / sizeof(arr[0])
 #define PATH_LEN 256
 #define HELP_MSG                                                               \
   "Help msg\n"                                                                 \
   "TEste\n"
-#define JSON_FORMAT                                                            \
-  ",\n"                                                                        \
-  "  {\n"                                                                      \
-  "    \"id\": %d,\n"                                                          \
-  "    \"description\": \"%s\",\n"                                             \
-  "    \"status\": \"%s\",\n"                                                  \
-  "    \"created_at\": %ld,\n"                                                 \
-  "    \"updated_at\": %ld\n"                                                  \
-  "  }\n"                                                                      \
-  "]\n"
 
 typedef enum { IN_PROGRESS = 1, DONE } task_status;
 typedef enum {
@@ -34,8 +25,8 @@ struct task_type {
   int id;
   char *description;
   char status[15];
-  long int created_at;
-  long int updated_at;
+  time_t created_at;
+  time_t updated_at;
 };
 
 struct tasks {

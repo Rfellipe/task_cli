@@ -1,7 +1,6 @@
 #include "main.h"
 #include <dirent.h>
 #include <errno.h>
-#include <stdio.h>
 #include <sys/stat.h>
 
 FILE *task_file;
