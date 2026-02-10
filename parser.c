@@ -122,10 +122,8 @@ int write_new_task_file(FILE *task_file, struct tasks tasks) {
   fflush(task_file);
   fseek(task_file, 0, SEEK_SET);
 
-  printf("task_len %d\n", tasks.tasks_len);
-
   fputs("[\n", task_file);
-  for (int i = 0; i <= tasks.tasks_len; i++) {
+  for (int i = 0; i < tasks.tasks_len; i++) {
     fputs("{\"id\":", task_file);
     fprintf(task_file, "%d,", tasks.tasks[i]->id);
 

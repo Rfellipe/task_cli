@@ -36,21 +36,22 @@ int add_task(char *task_description) {
     error(ARG_MISS, "description");
   }
 
-  new_task_id = parsed_tasks.tasks_len
-                    ? parsed_tasks.tasks[parsed_tasks.tasks_len - 1]->id
-                    : 0;
+  new_task_id = parsed_tasks.tasks_len // if tasks length > 0
+                    ? parsed_tasks.tasks[parsed_tasks.tasks_len - 1]
+                          ->id // get previous task id
+                    : 0;       // else new_task_id equals 0
 
   struct task_type new_task = {
-      .id = new_task_id + 1,
+      .id = new_task_id + 1, // new_task_id because count start at 1
       .description = task_description,
       .status = "todo",
       .created_at = time(NULL),
       .updated_at = time(NULL),
   };
 
-  parsed_tasks.tasks[new_task_id] = malloc(sizeof(struct task_type));
-  *parsed_tasks.tasks[new_task_id] = new_task;
-  parsed_tasks.tasks_len = new_task_id;
+  parsed_tasks.tasks[parsed_tasks.tasks_len] = malloc(sizeof(struct task_type));
+  *parsed_tasks.tasks[parsed_tasks.tasks_len] = new_task;
+  parsed_tasks.tasks_len = parsed_tasks.tasks_len + 1;
 
   write_new_task_file(task_file, parsed_tasks);
 
@@ -71,20 +72,25 @@ int update_task(char *task_id, char *task_description, int new_status) {
   }
 
   id = atoi(task_id);
+  struct task_type *task = parsed_tasks.tasks[id - 1];
 
   if (new_status) {
     // TODO: Path for mark-in-progress and mark-done
     switch (new_status) {
     case IN_PROGRESS:
+      snprintf(task->status, sizeof(task->status), "%s", "in-progress");
       break;
     case DONE:
+      snprintf(task->status, sizeof(task->status), "%s", "done");
       break;
     default:
       panic("Parameter not recognized");
     }
-
-    return 0;
+  } else {
+    parsed_tasks.tasks[id - 1]->description = strdup(task_description);
   }
+
+  write_new_task_file(task_file, parsed_tasks);
 
   return 0;
 }
